@@ -40,22 +40,27 @@ def main():
     st.title("Análise de Estruturas")
     st.write("Informe as coordenadas, conectividades e restrições para análise da estrutura.")
 
-    coord = st.text_area("Matriz de coordenadas (formato: linha por linha, separadas por espaço)")
-    coord = np.fromstring(coord, sep=" ").reshape(-1, 3)
+    st.subheader("Coordenadas")
+    coord_table = st.table(np.zeros((4, 3)))  # Example initial table with 4 rows and 3 columns
 
-    conec = st.text_area("Matriz de conectividades (formato: linha por linha, separadas por espaço)")
-    conec = np.fromstring(conec, sep=" ").reshape(-1, 3)
+    st.subheader("Conectividades")
+    conec_table = st.table(np.zeros((3, 3)))  # Example initial table with 3 rows and 3 columns
 
-    kb = st.text_input("Constantes de rigidez (separadas por espaço)")
-    kb = np.fromstring(kb, sep=" ")
+    st.subheader("Constantes de Rigidez")
+    kb_values = st.text_input("Valores das constantes de rigidez (separados por espaço)")
 
     force_node = st.number_input("Nó onde a força será aplicada", value=4)
     force_value = st.number_input("Valor da força", value=5000)
 
     blocked_nodes = st.text_input("Nós bloqueados (separados por espaço)")
-    blocked_nodes = np.fromstring(blocked_nodes, sep=" ", dtype=int)
 
     if st.button("Calcular"):
+        coord = np.array(coord_table.data)
+        conec = np.array(conec_table.data)
+        kb = np.fromstring(kb_values, sep=" ")
+
+        blocked_nodes = np.fromstring(blocked_nodes, sep=" ", dtype=int)
+
         xcomp = calculate_displacements(coord, conec, kb, force_node, force_value, blocked_nodes)
         st.write("Deslocamentos calculados:")
         st.write(xcomp)
@@ -63,4 +68,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
