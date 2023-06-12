@@ -1,6 +1,5 @@
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def calculate_displacements(coord, conec, kb, force_node, force_value, blocked_nodes):
@@ -37,32 +36,6 @@ def calculate_displacements(coord, conec, kb, force_node, force_value, blocked_n
     return xcomp
 
 
-def plot_structure(coord, conec, kb):
-    fig, ax = plt.subplots()
-
-    for i in range(conec.shape[0]):
-        no1 = conec[i, 1]
-        no2 = conec[i, 2]
-
-        x = [coord[no1, 0], coord[no2, 0]]
-        y = [coord[no1, 1], coord[no2, 1]]
-
-        ax.plot(x, y, 'k-', linewidth=2)
-
-        center_x = (coord[no1, 0] + coord[no2, 0]) / 2
-        center_y = (coord[no1, 1] + coord[no2, 1]) / 2
-
-        ax.text(center_x, center_y, f'k = {kb[i]}', ha='center', va='center')
-
-    ax.scatter(coord[:, 0], coord[:, 1], color='red')
-
-    ax.set_xlabel('Coordenada X')
-    ax.set_ylabel('Coordenada Y')
-    ax.set_title('Geometria da Estrutura')
-
-    st.pyplot(fig)
-
-
 def main():
     st.title("Análise de Estruturas")
     st.write("Informe as coordenadas, conectividades e restrições para análise da estrutura.")
@@ -87,8 +60,7 @@ def main():
         st.write("Deslocamentos calculados:")
         st.write(xcomp)
 
-        plot_structure(coord, conec, kb)
-
 
 if __name__ == "__main__":
     main()
+
