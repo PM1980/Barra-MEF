@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import numpy as np
 
 
@@ -37,33 +38,39 @@ def calculate_displacements(coord, conec, kb, force_node, force_value, blocked_n
 
 
 def main():
-    st.title("Análise de Estruturas")
-    st.write("Informe as coordenadas, conectividades e restrições para análise da estrutura.")
+    st.title("Structural Analysis")
 
-    st.subheader("Coordenadas")
-    coord_table = st.table(np.zeros((4, 3)))  # Example initial table with 4 rows and 3 columns
+    st.subheader("Upload Coordinates (coord)")
+    coord_file = st.file_uploader("Upload CSV", type="csv")
+    if coord_file is not None:
+        coord_df = pd.read_csv(coord_file)
+        st.write(coord_df)
 
-    st.subheader("Conectividades")
-    conec_table = st.table(np.zeros((3, 3)))  # Example initial table with 3 rows and 3 columns
+    st.subheader("Upload Connectivities (conec)")
+    conec_file = st.file_uploader("Upload CSV", type="csv")
+    if conec_file is not None:
+        conec_df = pd.read_csv(conec_file)
+        st.write(conec_df)
 
-    st.subheader("Constantes de Rigidez")
-    kb_values = st.text_input("Valores das constantes de rigidez (separados por espaço)")
+    kb_values = st.text_input("Values of Stiffness Coefficients (separated by space)")
+    force_node = st.number_input("Node where the force will be applied")
+    force_value = st.number_input("Value of the force")
 
-    force_node = st.number_input("Nó onde a força será aplicada", value=4)
-    force_value = st.number_input("Valor da força", value=5000)
+    blocked_nodes = st.text_input("Blocked Nodes (separated by space)")
 
-    blocked_nodes = st.text_input("Nós bloqueados (separados por espaço)")
+    if st.button("Calculate"):
+        if coord_file is None or conec_file is None:
+            st.error("Please upload both coord and conec files.")
+        else:
+            coord = coord_df.values
+            conec = conec_df.values
+            kb = np.fromstring(kb_values, sep=" ")
 
-    if st.button("Calcular"):
-        coord = np.array(coord_table.data)
-        conec = np.array(conec_table.data)
-        kb = np.fromstring(kb_values, sep=" ")
+            blocked_nodes = np.fromstring(blocked_nodes, sep=" ", dtype=int)
 
-        blocked_nodes = np.fromstring(blocked_nodes, sep=" ", dtype=int)
-
-        xcomp = calculate_displacements(coord, conec, kb, force_node, force_value, blocked_nodes)
-        st.write("Deslocamentos calculados:")
-        st.write(xcomp)
+            xcomp = calculate_displacements(coord, conec, kb, force_node, force_value, blocked_nodes)
+            st.write("Calculated Displacements:")
+            st.write(xcomp)
 
 
 if __name__ == "__main__":
