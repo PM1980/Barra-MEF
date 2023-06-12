@@ -41,16 +41,18 @@ def main():
     st.title("Structural Analysis")
 
     st.subheader("Upload Coordinates (coord)")
-    coord_file = st.file_uploader("Upload CSV", type="csv")
-    if coord_file is not None:
-        coord_df = pd.read_csv(coord_file)
-        st.write(coord_df)
+    coord_files = st.file_uploader("Upload CSV", type="csv", key="coord_upload", accept_multiple_files=True)
+    if coord_files:
+        coord_data = [pd.read_csv(file) for file in coord_files]
+        for data in coord_data:
+            st.write(data)
 
     st.subheader("Upload Connectivities (conec)")
-    conec_file = st.file_uploader("Upload CSV", type="csv")
-    if conec_file is not None:
-        conec_df = pd.read_csv(conec_file)
-        st.write(conec_df)
+    conec_files = st.file_uploader("Upload CSV", type="csv", key="conec_upload", accept_multiple_files=True)
+    if conec_files:
+        conec_data = [pd.read_csv(file) for file in conec_files]
+        for data in conec_data:
+            st.write(data)
 
     kb_values = st.text_input("Values of Stiffness Coefficients (separated by space)")
     force_node = st.number_input("Node where the force will be applied")
@@ -59,11 +61,11 @@ def main():
     blocked_nodes = st.text_input("Blocked Nodes (separated by space)")
 
     if st.button("Calculate"):
-        if coord_file is None or conec_file is None:
+        if not coord_files or not conec_files:
             st.error("Please upload both coord and conec files.")
         else:
-            coord = coord_df.values
-            conec = conec_df.values
+            coord = np.concatenate([data.values for data in coord_data], axis=0)
+            conec = np.concatenate([data.values for data in conec_data], axis=0)
             kb = np.fromstring(kb_values, sep=" ")
 
             blocked_nodes = np.fromstring(blocked_nodes, sep=" ", dtype=int)
